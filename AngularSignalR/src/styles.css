@@ -1,0 +1,17 @@
+@import "../node_modules/ag-grid-community/dist/styles/ag-grid.css";
+@import "../node_modules/ag-grid-community/dist/styles/ag-theme-alpine.css";
+
+.grid-row-green
+{
+    background-color: green !important;
+}
+
+.grid-row-red
+{
+    background-color: red !important;
+}
+
+.grid-row-blue
+{
+    background-color: rgb(113, 113, 252) !important;
+}

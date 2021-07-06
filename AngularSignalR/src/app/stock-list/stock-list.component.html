@@ -1,0 +1,10 @@
+<div>
+    <ag-grid-angular #stockGrid (gridReady)="onStockGridReady($event)" style="width: 600px; height: 500px; column-width: auto"
+                     class="ag-theme-alpine"
+                     [rowData]="stocks"
+                     [columnDefs]="columnDefs"
+                     rowSelection="multiple"
+                     [rowClassRules]="rowClassRules"
+                     [gridOptions]="stockGridOptions">
+    </ag-grid-angular>
+  </div>
