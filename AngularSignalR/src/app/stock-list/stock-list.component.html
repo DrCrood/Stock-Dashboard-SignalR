@@ -8,3 +8,9 @@
                      [gridOptions]="stockGridOptions">
     </ag-grid-angular>
   </div>
+
+  <div>
+    <ul>
+      <li *ngFor="let notice of notices"> {{notice.stockSymbol}} - {{notice.eventType}} - {{notice.noticeTime}}  </li>
+    </ul>
+  </div>

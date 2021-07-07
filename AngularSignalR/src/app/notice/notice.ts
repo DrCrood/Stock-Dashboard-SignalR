@@ -1,7 +1,7 @@
 
 export interface Notice {
-    id: number;
-    stocksymbol: string;
-    noticetime: Date;
-    eventtype: string;
+    id: string;
+    stockSymbol: string;
+    noticeTime: Date;
+    eventType: string;
 }

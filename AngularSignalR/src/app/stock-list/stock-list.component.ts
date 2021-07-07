@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Stock } from '../stock/stock';
+import { Notice} from '../notice/notice'
 import { StockService } from '../stock/stock.service';
 import * as signalR from '@microsoft/signalr';
 import { environment } from 'src/environments/environment';
@@ -14,6 +15,8 @@ import { GridOptions } from 'ag-grid-community';
 export class StockListComponent implements OnInit {
   pageTitle = 'Stock List';
   stocks: Stock[] = [];
+  notices: Notice[] = [];
+  symbols: string[] = [];
   errorMessage = '';
   api : any;
   columnApi : any;
@@ -62,6 +65,20 @@ export class StockListComponent implements OnInit {
     connection.on("PriceChangedEvent", () => {
       this.getStocks();
     });
+
+    connection.on("ChangeNotice", (notice) => {
+      if(this.symbols.includes(notice.stockSymbol))
+      {
+        let n = this.notices.find( s => s.stockSymbol === notice.stockSymbol);
+        let i = this.notices.indexOf(n);
+        this.notices[i] = notice;
+      }
+      else
+      {
+        this.notices.push(notice);
+        this.symbols.push(notice.stockSymbol);
+      }
+    });
   }
 
   public onStockGridReady(event: any)
@@ -70,12 +87,7 @@ export class StockListComponent implements OnInit {
     this.columnApi = event.columnApi;
     this.stockGridOptions.api.sizeColumnsToFit();
 
-    this.stockGrid.getRowClass = () => { return 'black' };
-
   }
-
-
-
 
   getStocks() {
     this.stockService.getStocks().subscribe(
@@ -87,7 +99,7 @@ export class StockListComponent implements OnInit {
   }
 
   deleteStock(symbol: string): void {
-      if (confirm(`Are you sure want to delete this Stock: ${name}?`)) {
+      if (confirm(`Are you sure want to remove this Stock: ${symbol}?`)) {
         this.stockService.removeStock(symbol)
           .subscribe(
             () => this.onSaveComplete(),

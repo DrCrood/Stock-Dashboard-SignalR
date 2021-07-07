@@ -25,26 +25,16 @@ namespace NET5SignalR.Controllers
 
             if(context.Stocks.Count() < 1)
             {
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 55, Change = 5, Symbol = "TVVT", updateTime = DateTime.Now });
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "TVVT", NoticeTime = DateTime.Now, EventType = "PRICEUP" });
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 55, Change = 5, Symbol = "MORT", updateTime = DateTime.Now });
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "MORT", NoticeTime = DateTime.Now, EventType = "PRICEUP" });
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 55, Change = 5, Symbol = "GOOG", updateTime = DateTime.Now});
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "GOOG", NoticeTime = DateTime.Now, EventType = "PRICEUP" });
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 55, Change = 5, Symbol = "MIST", updateTime = DateTime.Now });
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "MIST", NoticeTime = DateTime.Now, EventType = "PRICEUP" });
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 55, Change = 5, Symbol = "BOOK", updateTime = DateTime.Now });
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "BOOK", NoticeTime = DateTime.Now, EventType = "PRICEUP" });
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 45, Change = -5, Symbol = "CART", updateTime = DateTime.Now });
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "CART", NoticeTime = DateTime.Now, EventType = "PRICEDOWN" });
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 45, Change = -5, Symbol = "MART", updateTime = DateTime.Now });
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "MART", NoticeTime = DateTime.Now, EventType = "PRICEDOWN" });
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 45, Change = -5, Symbol = "BIKE", updateTime = DateTime.Now });
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "BIKE", NoticeTime = DateTime.Now, EventType = "PRICEDOWN" });
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 45, Change = -5, Symbol = "COOT", updateTime = DateTime.Now });
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "COOT", NoticeTime = DateTime.Now, EventType = "PRICEDOWN" });
-                context.Stocks.Add(new Stock() { Price_pre = 50, Price_new = 45, Change = -5, Symbol = "ORAK", updateTime = DateTime.Now });
-                context.Notice.Add(new Notice() { Id = Guid.NewGuid().ToString(), StockSymbol = "ORAK", NoticeTime = DateTime.Now, EventType = "PRICEDOWN" });
+                context.Stocks.Add(new Stock("TVVT", 50, 55));
+                context.Stocks.Add(new Stock("LESS", 50, 55));
+                context.Stocks.Add(new Stock("GOOG", 50, 55));
+                context.Stocks.Add(new Stock("MIST", 50, 55));
+                context.Stocks.Add(new Stock("FACE", 50, 55));
+                context.Stocks.Add(new Stock("GOOD", 50, 45));
+                context.Stocks.Add(new Stock("HOSE", 50, 45));
+                context.Stocks.Add(new Stock("TREE", 50, 45));
+                context.Stocks.Add(new Stock("GMCC", 50, 45));
+                context.Stocks.Add(new Stock("FORD", 50, 45));
 
                 context.SaveChanges();
             }
@@ -84,11 +74,7 @@ namespace NET5SignalR.Controllers
 
             _context.Entry(stock).State = EntityState.Modified;
 
-            Notice notice = new Notice()
-            {
-                StockSymbol = stock.Symbol,
-                EventType = "Edit"
-            };
+            Notice notice = new Notice(stock.Symbol, stock.Change);
             _context.Notice.Add(notice);
 
             try
@@ -118,11 +104,7 @@ namespace NET5SignalR.Controllers
         {
             _context.Stocks.Add(stock);
 
-            Notice notice = new Notice()
-            {
-                StockSymbol = stock.Symbol,
-                EventType = "Add"
-            };
+            Notice notice = new Notice(stock.Symbol, stock.Change);
             _context.Notice.Add(notice);
 
             try
@@ -147,7 +129,7 @@ namespace NET5SignalR.Controllers
 
         // DELETE: api/Employees/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(string id)
+        public async Task<IActionResult> DeleteStock(string id)
         {
             var stock = await _context.Stocks.FindAsync(id);
             if (stock == null)
@@ -155,11 +137,7 @@ namespace NET5SignalR.Controllers
                 return NotFound();
             }
 
-            Notice notification = new Notice()
-            {
-                StockSymbol = stock.Symbol,
-                EventType = "Delete"
-            };
+            Notice notification = new Notice(stock.Symbol, stock.Change);
 
             _context.Stocks.Remove(stock);
             _context.Notice.Add(notification);
@@ -184,6 +162,12 @@ namespace NET5SignalR.Controllers
         public void UpdateClients()
         {
             this._hubContext.Clients.All.PriceChangedEvent();
+        }
+
+        [NonAction]
+        public async Task SendChangeEventAsync(Notice notice)
+        {
+            await this._hubContext.Clients.All.ChangeNotice( notice);
         }
 
     }

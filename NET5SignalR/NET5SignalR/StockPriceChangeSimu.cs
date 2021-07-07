@@ -28,7 +28,7 @@ namespace NET5SignalR
 
             rand = new Random();
         }
-        public void Update()
+        public async Task Update()
         {
             var stockList = _context.Stocks.ToListAsync().GetAwaiter().GetResult();
 
@@ -38,10 +38,16 @@ namespace NET5SignalR
                 int p = s.Price_new + ((int)(10 * (0.5 - rand.NextDouble())));
                 s.Price_new = p > 2 ? p : 2;
                 s.Change = s.Price_new - s.Price_pre;
+                Notice notice = new Notice(s.Symbol, s.Change);
+                _context.Add( notice);
+
+                if(s.Change != 0)
+                {
+                    await _controller.SendChangeEventAsync(notice);
+                }               
+
             }
-
             _context.SaveChanges();
-
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
@@ -54,7 +60,7 @@ namespace NET5SignalR
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                this.Update();
+                await this.Update();
                 _controller.UpdateClients();
                 await Task.Delay(2000, stoppingToken);
             }
