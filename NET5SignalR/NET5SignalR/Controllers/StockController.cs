@@ -165,9 +165,16 @@ namespace NET5SignalR.Controllers
         }
 
         [NonAction]
-        public async Task SendChangeEventAsync(Notice notice)
+        public async Task SendChangeEvent(Notice notice)
         {
             await this._hubContext.Clients.All.ChangeNotice( notice);
+        }
+
+        [NonAction]
+        public void AddStock(Stock stock)
+        {
+            _context.Stocks.Add(stock);
+            _context.SaveChanges();
         }
 
     }

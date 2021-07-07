@@ -6,5 +6,7 @@ namespace NET5SignalR.Models
     {
         Task PriceChangedEvent();
         Task ChangeNotice( Notice notice);
+
+        Task AddStock(Stock stock);
     }
 }

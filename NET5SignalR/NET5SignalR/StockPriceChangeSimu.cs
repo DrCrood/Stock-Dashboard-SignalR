@@ -43,7 +43,7 @@ namespace NET5SignalR
 
                 if(s.Change != 0)
                 {
-                    await _controller.SendChangeEventAsync(notice);
+                    await _controller.SendChangeEvent(notice);
                 }               
 
             }
