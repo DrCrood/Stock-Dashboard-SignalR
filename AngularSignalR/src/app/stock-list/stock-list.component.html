@@ -14,3 +14,7 @@
       <li *ngFor="let notice of notices"> {{notice.stockSymbol}} - {{notice.eventType}} - {{notice.noticeTime}}  </li>
     </ul>
   </div>
+
+  <div>
+    <button (click) = "AddStock()"> Add stock</button>
+  </div>

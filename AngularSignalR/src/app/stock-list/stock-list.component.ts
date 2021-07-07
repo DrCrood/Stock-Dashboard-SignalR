@@ -21,6 +21,7 @@ export class StockListComponent implements OnInit {
   api : any;
   columnApi : any;
   rowClassRules : any;
+  connection : signalR.HubConnection;
 
   @ViewChild('stockGrid') stockGrid: AgGridAngular;
 
@@ -51,22 +52,22 @@ export class StockListComponent implements OnInit {
 
     this.getStocks();
 
-    const connection = new signalR.HubConnectionBuilder()
+      this.connection = new signalR.HubConnectionBuilder()
       .configureLogging(signalR.LogLevel.Information)
       .withUrl(environment.baseUrl + 'notify')
       .build();
 
-    connection.start().then(function () {
+    this.connection.start().then(function () {
       console.log('SignalR Connected!');
     }).catch(function (err) {
       return console.error(err.toString());
     });
 
-    connection.on("PriceChangedEvent", () => {
+    this.connection.on("PriceChangedEvent", () => {
       this.getStocks();
     });
 
-    connection.on("ChangeNotice", (notice) => {
+    this.connection.on("ChangeNotice", (notice) => {
       if(this.symbols.includes(notice.stockSymbol))
       {
         let n = this.notices.find( s => s.stockSymbol === notice.stockSymbol);
@@ -115,6 +116,18 @@ export class StockListComponent implements OnInit {
       },
       error => this.errorMessage = <any>error
     );
+  }
+
+  public AddStock()
+  {
+    let stock : Stock = new Stock();
+    stock.symbol = "COLL";
+    stock.updatetime = new Date();
+    stock.price_pre = 50;
+    stock.price_new = 60;
+    stock.change = 10;
+
+    this.connection.invoke("AddStock",  stock)
   }
 
 }  
