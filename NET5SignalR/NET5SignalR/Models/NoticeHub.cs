@@ -20,6 +20,8 @@ namespace NET5SignalR.Models
 
         public void AddStock(Stock stock)
         {
+            var context = Context;
+            var client = Clients;
             var s = _context.Stocks.Where(s => s.Symbol == stock.Symbol).FirstOrDefault();
             if(s == null)
             {
